@@ -7,10 +7,12 @@ import {
   Patch,
   Delete,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
 import { formatError } from 'src/utils/error.utils';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -19,6 +21,7 @@ export class UsersController {
     private readonly configService: ConfigService,
   ) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async addUser(
     @Body('username') username: string,
@@ -43,6 +46,7 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getAllUsers() {
     const users = await this.usersService.getAllUsers();
@@ -52,6 +56,7 @@ export class UsersController {
     };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':username')
   async getUser(@Param('username') username: string) {
     // return this.usersService.getUser(username);
@@ -61,6 +66,7 @@ export class UsersController {
     return { success: 'User found', user };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':username')
   async updateUser(
     @Param('username') username: string,
@@ -81,9 +87,15 @@ export class UsersController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':username')
   async removeUser(@Param('username') username: string) {
-    await this.usersService.deleteUser(username);
+    const deletedCount = await this.usersService.deleteUser(username);
+    if (deletedCount === 0) {
+      throw new BadRequestException(
+        formatError(this.configService, 'Failed to delete user', null),
+      );
+    }
     return { success: `User ${username} deleted` };
   }
 }
