@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
-import { formatError } from 'src/utils/error.utils';
+import { formatError } from '../utils/error.utils';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
