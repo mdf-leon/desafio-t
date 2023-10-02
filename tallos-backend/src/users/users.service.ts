@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './user.model';
@@ -39,6 +39,7 @@ export class UsersService {
         id: user.id,
         username: user.username,
         password: showPassword ? user.password : null,
+        permissions: user.permissions,
       }
     );
   }
@@ -70,5 +71,20 @@ export class UsersService {
   private async findUser(username: string): Promise<User> {
     const user = await this.userModel.findOne({ username }).exec();
     return user;
+  }
+
+  async updateUserPermissions(username: string, permissions: string[]) {
+    const user = await this.findUser(username); // Get the Mongoose document instance
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.permissions = permissions;
+    await user.save();
+    return {
+      id: user.id,
+      username: user.username,
+      permissions: user.permissions,
+      // ... any other fields you wish to return but not password
+    };
   }
 }
