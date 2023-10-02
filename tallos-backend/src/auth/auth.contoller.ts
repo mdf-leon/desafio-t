@@ -8,10 +8,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
-// import { formatError } from 'src/utils/error.utils';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from 'src/users/users.service';
-import { formatError } from 'src/utils/error.utils';
+import { UsersService } from '../users/users.service';
+import { formatError } from '../utils/error.utils';
 
 @Controller('auth')
 export class AuthController {
@@ -42,8 +41,9 @@ export class AuthController {
     delete createdUser.password;
 
     return {
+      success: 'User created successfully',
       user: createdUser,
-      ...loginResponse,
+      token: loginResponse,
     };
   }
 
