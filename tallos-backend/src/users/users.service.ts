@@ -72,6 +72,3 @@ export class UsersService {
     return user;
   }
 }
-// if (result.deletedCount === 0) {
-//   throw new NotFoundException('Could not find user.');
-// }
