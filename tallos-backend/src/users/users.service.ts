@@ -74,7 +74,7 @@ export class UsersService {
   }
 
   async updateUserPermissions(username: string, permissions: string[]) {
-    const user = await this.findUser(username); // Get the Mongoose document instance
+    const user = await this.findUser(username);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -84,7 +84,6 @@ export class UsersService {
       id: user.id,
       username: user.username,
       permissions: user.permissions,
-      // ... any other fields you wish to return but not password
     };
   }
 }
