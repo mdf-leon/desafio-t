@@ -9,10 +9,10 @@
         <h2 class="text-xl font-bold mb-3">Login</h2>
 
         <form class="grid grid-cols-1 gap-3" @submit.prevent="login">
-          <DInput type="text" v-model="loginData.username" placeholder="Username" />
-          <DInput type="password" v-model="loginData.password" placeholder="Password" />
+          <DInput name="login-username" type="text" v-model="loginData.username" placeholder="Username" />
+          <DInput name="login-password" type="password" v-model="loginData.password" placeholder="Password" />
 
-          <DButton type="submit">Login</DButton>
+          <DButton name="login-submit" type="submit">Login</DButton>
         </form>
       </div>
 
@@ -20,10 +20,10 @@
         <h2 class="text-xl font-bold mb-3">Register</h2>
 
         <form class="grid grid-cols-1 gap-3" @submit.prevent="register">
-          <DInput type="text" v-model="registerData.username" placeholder="Username" />
-          <DInput type="password" v-model="registerData.password" placeholder="Password" />
+          <DInput name="register-username" type="text" v-model="registerData.username" placeholder="Username" />
+          <DInput name="register-password" type="password" v-model="registerData.password" placeholder="Password" />
           
-          <DButton type="submit" class="border rounded">Register</DButton>
+          <DButton name="register-submit" type="submit" class="border rounded">Register</DButton>
         </form>
       </div>
     </div>

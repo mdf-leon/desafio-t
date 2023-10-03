@@ -5,10 +5,10 @@
     </h2>
 
     <form class="grid grid-cols-1 gap-3" @submit.prevent="save">
-      <DInput type="text" v-model="user.username" placeholder="Username" :disabled="saving" />
-      <DInput type="password" v-model="user.password" placeholder="Password" :disabled="saving" />
+      <DInput name="edit-username" type="text" v-model="user.username" placeholder="Username" :disabled="saving" />
+      <DInput name="edit-password" type="password" v-model="user.password" placeholder="Password" :disabled="saving" />
 
-      <DButton type="submit" class="mt-5" :disabled="saving">
+      <DButton name="edit-submit" type="submit" class="mt-5" :disabled="saving">
         {{ isCreating ? "Criar": "Salvar" }}
       </DButton>
     </form>
