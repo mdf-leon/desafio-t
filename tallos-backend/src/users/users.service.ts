@@ -43,6 +43,18 @@ export class UsersService {
     return await this.findUser(username, showPassword);
   }
 
+  async getUserById<TShowPassword extends boolean>(
+    id: string,
+    showPassword?: TShowPassword,
+  ) {
+    const user = await this.userModel.findById(id).exec();
+    if (!user) {
+      return null;
+    }
+    if (showPassword !== true) user.password = undefined;
+    return user;
+  }
+
   async updateUser<TShowPassword extends boolean>(
     username: string,
     newUsername: string,

@@ -14,15 +14,15 @@ export class AuthService {
     const user = await this.usersService.getUser(username, true);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const payload = { username: user.username, sub: user.id };
+      const payload = { sub: user.id };
       return this.jwtService.sign(payload);
     } else {
       throw new UnauthorizedException('Invalid credentials.');
     }
   }
 
-  async validateUser(username: string) {
-    const user = await this.usersService.getUser(username);
+  async validateUser(id: string) {
+    const user = await this.usersService.getUserById(id);
 
     if (user) {
       return user;
