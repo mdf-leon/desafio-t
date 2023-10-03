@@ -23,6 +23,7 @@ export class AuthService {
 
   async validateUser(username: string) {
     const user = await this.usersService.getUser(username);
+
     if (user) {
       return user;
     }

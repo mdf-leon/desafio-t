@@ -38,8 +38,6 @@ export class AuthController {
       body.password,
     );
 
-    delete createdUser.password;
-
     return {
       success: 'User created successfully',
       user: createdUser,

@@ -6,61 +6,58 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-  async createUser(username: string, password: string, showPassword = false) {
+  async createUser<TShowPassword extends boolean>(
+    username: string,
+    password: string,
+    showPassword?: TShowPassword,
+  ): Promise<TShowPassword extends true ? User : Omit<User, 'password'>> {
     const newUser = new this.userModel({
       username,
       password: await bcrypt.hash(password, 10),
     });
     const user = await newUser.save();
-    return {
-      id: user.id,
-      username: user.username,
-      password: showPassword ? user.password : null,
-    };
+
+    if (showPassword !== true) user.password = undefined;
+
+    return user;
   }
 
-  async getAllUsers(showPassword = false) {
+  async getAllUsers<TShowPassword extends boolean>(
+    showPassword?: TShowPassword,
+  ): Promise<TShowPassword extends true ? User[] : Omit<User, 'password'>[]> {
     const users = await this.userModel.find().exec();
-    return users.map((user) => ({
-      id: user.id,
-      username: user.username,
-      password: showPassword ? user.password : null,
-    }));
+    if (showPassword !== true) {
+      users.forEach((user) => {
+        user.password = undefined;
+      });
+    }
+    return users;
   }
 
-  async getUser(username: string, showPassword = false) {
-    const user = await this.findUser(username);
-
-    return (
-      user && {
-        id: user.id,
-        username: user.username,
-        password: showPassword ? user.password : null,
-        permissions: user.permissions,
-      }
-    );
+  async getUser<TShowPassword extends boolean>(
+    username: string,
+    showPassword?: TShowPassword,
+  ) {
+    return await this.findUser(username, showPassword);
   }
 
-  async updateUser(
+  async updateUser<TShowPassword extends boolean>(
     username: string,
     newUsername: string,
     newPassword: string,
-    showPassword = false,
+    showPassword?: TShowPassword,
   ) {
-    const user = await this.findUser(username);
+    const user = await this.findUser(username, true);
     if (newPassword) {
       user.username = newUsername;
       user.password = await bcrypt.hash(newPassword, 10);
     }
     const updatedUser = await user.save();
-    return {
-      id: updatedUser.id,
-      username: updatedUser.username,
-      password: showPassword ? updatedUser.password : null,
-    };
+    if (showPassword !== true) updatedUser.password = undefined;
+
+    return updatedUser;
   }
 
   async deleteUser(username: string) {
@@ -68,22 +65,30 @@ export class UsersService {
     return result.deletedCount;
   }
 
-  private async findUser(username: string): Promise<User> {
+  private async findUser<TShowPassword extends boolean>(
+    username: string,
+    showPassword?: TShowPassword,
+  ): Promise<TShowPassword extends true ? User : Omit<User, 'password'>> {
     const user = await this.userModel.findOne({ username }).exec();
+    if (!user) {
+      return null;
+    }
+    if (showPassword !== true) user.password = undefined;
     return user;
   }
 
-  async updateUserPermissions(username: string, permissions: string[]) {
-    const user = await this.findUser(username);
+  async updateUserPermissions<TShowPassword extends boolean>(
+    username: string,
+    permissions: string[],
+    showPassword?: TShowPassword,
+  ): Promise<TShowPassword extends true ? User : Omit<User, 'password'>> {
+    const user = await this.findUser(username, true);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     user.permissions = permissions;
     await user.save();
-    return {
-      id: user.id,
-      username: user.username,
-      permissions: user.permissions,
-    };
+    if (showPassword !== true) user.password = undefined;
+    return user;
   }
 }
