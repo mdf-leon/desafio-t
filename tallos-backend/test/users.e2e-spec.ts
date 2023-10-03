@@ -36,6 +36,7 @@ describe('UsersController (e2e)', () => {
         expect(response.body.error).toEqual('Conflict');
       });
   });
+
   it('should fail to login with an incorrect password', () => {
     return request(app.getHttpServer())
       .post('/auth/login')
