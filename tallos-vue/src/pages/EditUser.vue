@@ -1,14 +1,16 @@
 <template>
   <div class="container my-5 w-3/4 mx-auto">
     <h2 class="text-xl mb-5">
-      Editando usuário <strong v-text="user.username" />
+      {{ isCreating ? "Criando": "Editando" }} usuário <strong v-text="user.username" />
     </h2>
 
     <form class="grid grid-cols-1 gap-3" @submit.prevent="save">
       <DInput type="text" v-model="user.username" placeholder="Username" :disabled="saving" />
       <DInput type="password" v-model="user.password" placeholder="Password" :disabled="saving" />
 
-      <DButton type="submit" class="mt-5" :disabled="saving">Salvar</DButton>
+      <DButton type="submit" class="mt-5" :disabled="saving">
+        {{ isCreating ? "Criar": "Salvar" }}
+      </DButton>
     </form>
   </div>
 </template>
@@ -35,11 +37,21 @@ export default {
     }
   },
 
+  computed: {
+    isCreating() {
+      return this.$route.path === "/create";	
+    }
+  },
+
   methods: {
     async save() {
       this.saving = true;
 
-      await this.$http.patch("/users/" + this.$route.params.username, this.user);
+      if (this.isCreating) {
+        await this.$http.post("/users", this.user);
+      } else {
+        await this.$http.patch("/users/" + this.$route.params.username, this.user);
+      }
 
       this.saving = false;
 
