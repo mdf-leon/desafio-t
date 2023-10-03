@@ -4,14 +4,14 @@ import {
   Body,
   Get,
   UseGuards,
-  BadRequestException,
+  ConflictException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
-// import { formatError } from 'src/utils/error.utils';
 import { AuthGuard } from '@nestjs/passport';
-import { UsersService } from 'src/users/users.service';
-import { formatError } from 'src/utils/error.utils';
+import { UsersService } from '../users/users.service';
+import { formatError } from '../utils/error.utils';
 
 @Controller('auth')
 export class AuthController {
@@ -23,10 +23,9 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: { username: string; password: string }) {
-    // Check if user exists
     const existingUser = await this.usersService.getUser(body.username);
     if (existingUser) {
-      throw new BadRequestException('Username already exists.');
+      throw new ConflictException('Username already exists.');
     }
 
     const createdUser = await this.usersService.createUser(
@@ -39,11 +38,10 @@ export class AuthController {
       body.password,
     );
 
-    delete createdUser.password;
-
     return {
+      success: 'User created successfully',
       user: createdUser,
-      ...loginResponse,
+      token: loginResponse,
     };
   }
 
@@ -51,12 +49,14 @@ export class AuthController {
   async login(
     @Body('username') username: string,
     @Body('password') password: string,
-  ) {
+  ): Promise<any> {
     try {
       const token = await this.authService.login(username, password);
       return { success: 'Login successful', token };
     } catch (error) {
-      throw formatError(this.configService, 'Login failed', error);
+      throw new UnauthorizedException(
+        formatError(this.configService, 'Login failed', error),
+      );
     }
   }
 
