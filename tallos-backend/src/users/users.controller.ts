@@ -9,7 +9,7 @@ import {
   BadRequestException,
   UseGuards,
   Req,
-  UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users.service';
@@ -36,7 +36,7 @@ export class UsersController {
     @Req() req: any,
   ) {
     if (!this.hasPermission(req.user, 'createUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     try {
@@ -62,7 +62,7 @@ export class UsersController {
   @Get()
   async getAllUsers(@Req() req: any) {
     if (!this.hasPermission(req.user, 'readUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     const users = await this.usersService.getAllUsers();
@@ -76,7 +76,7 @@ export class UsersController {
   @Get(':username')
   async getUser(@Param('username') username: string, @Req() req: any) {
     if (!this.hasPermission(req.user, 'readUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     const user = await this.usersService.getUser(username);
@@ -94,7 +94,7 @@ export class UsersController {
     @Req() req: any,
   ) {
     if (!this.hasPermission(req.user, 'updateUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     try {
@@ -115,7 +115,7 @@ export class UsersController {
   @Delete(':username')
   async removeUser(@Param('username') username: string, @Req() req: any) {
     if (!this.hasPermission(req.user, 'deleteUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     const deletedCount = await this.usersService.deleteUser(username);
@@ -135,7 +135,7 @@ export class UsersController {
     @Req() req: any,
   ) {
     if (!this.hasPermission(req.user, 'updateUser')) {
-      throw new UnauthorizedException('Permission denied');
+      throw new ForbiddenException('Permission denied');
     }
 
     if (!Array.isArray(permissions)) {
