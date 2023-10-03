@@ -16,6 +16,14 @@ import { UsersService } from './users.service';
 import { formatError } from '../utils/error.utils';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from './user.model';
+import {
+  UserUsernameDto,
+  UpdateUserReqDto,
+  UserDto,
+  UserPermissionReqDto,
+} from './dto/user.dto';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -29,12 +37,13 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Post()
-  async addUser(
-    @Body('username') username: string,
-    @Body('password') password: string,
-    @Req() req: any,
-  ) {
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  async addUser(@Body() { username, password }: UserDto, @Req() req: Request) {
     if (!this.hasPermission(req.user, 'createUser')) {
       throw new ForbiddenException('Permission denied');
     }
@@ -59,8 +68,13 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Get()
-  async getAllUsers(@Req() req: any) {
+  @ApiResponse({
+    status: 200,
+    description: 'The users have been successfully retrieved.',
+  })
+  async getAllUsers(@Req() req: Request) {
     if (!this.hasPermission(req.user, 'readUser')) {
       throw new ForbiddenException('Permission denied');
     }
@@ -73,8 +87,13 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Get(':username')
-  async getUser(@Param('username') username: string, @Req() req: any) {
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully retrieved.',
+  })
+  async getUser(@Param() { username }: UserUsernameDto, @Req() req: Request) {
     if (!this.hasPermission(req.user, 'readUser')) {
       throw new ForbiddenException('Permission denied');
     }
@@ -86,12 +105,16 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Patch(':username')
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
   async updateUser(
-    @Param('username') username: string,
-    @Body('username') newUsername: string,
-    @Body('password') newPassword: string,
-    @Req() req: any,
+    @Param() { username }: UserUsernameDto,
+    @Body() { username: newUsername, password: newPassword }: UpdateUserReqDto,
+    @Req() req: Request,
   ) {
     if (!this.hasPermission(req.user, 'updateUser')) {
       throw new ForbiddenException('Permission denied');
@@ -112,8 +135,16 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Delete(':username')
-  async removeUser(@Param('username') username: string, @Req() req: any) {
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully deleted.',
+  })
+  async removeUser(
+    @Param() { username }: UserUsernameDto,
+    @Req() req: Request,
+  ) {
     if (!this.hasPermission(req.user, 'deleteUser')) {
       throw new ForbiddenException('Permission denied');
     }
@@ -128,11 +159,16 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
   @Patch(':username/permissions')
+  @ApiResponse({
+    status: 200,
+    description: 'The user permissions have been successfully updated.',
+  })
   async updateUserPermissions(
-    @Param('username') username: string,
-    @Body('permissions') permissions: string[],
-    @Req() req: any,
+    @Param() { username }: UserUsernameDto,
+    @Body() { permissions }: UserPermissionReqDto,
+    @Req() req: Request,
   ) {
     if (!this.hasPermission(req.user, 'updateUser')) {
       throw new ForbiddenException('Permission denied');

@@ -12,6 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from '../users/users.service';
 import { formatError } from '../utils/error.utils';
+import { ApiResponse } from '@nestjs/swagger';
+import { CreateUserDto, LoginUserDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,20 +24,21 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  async register(@Body() body: { username: string; password: string }) {
-    const existingUser = await this.usersService.getUser(body.username);
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully created.',
+  })
+  async register(@Body() { username, password }: CreateUserDto) {
+    const existingUser = await this.usersService.getUser(username);
     if (existingUser) {
       throw new ConflictException('Username already exists.');
     }
 
-    const createdUser = await this.usersService.createUser(
-      body.username,
-      body.password,
-    );
+    const createdUser = await this.usersService.createUser(username, password);
 
     const loginResponse = await this.authService.login(
       createdUser.username,
-      body.password,
+      password,
     );
 
     return {
@@ -46,10 +49,11 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body('username') username: string,
-    @Body('password') password: string,
-  ): Promise<any> {
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully logged in.',
+  })
+  async login(@Body() { username, password }: LoginUserDto) {
     try {
       const token = await this.authService.login(username, password);
       return { success: 'Login successful', token };
