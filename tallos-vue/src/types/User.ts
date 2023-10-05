@@ -9,11 +9,11 @@ export enum EPermissions {
 export interface IUser {
   id: number;
   username: string;
-  password: string;
+  password?: string;
   permissions: EPermissions[];
 }
 
-export interface ICreateUser {
+export interface IAuthUser {
   username: string;
   password: string;
 }

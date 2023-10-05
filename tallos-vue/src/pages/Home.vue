@@ -31,6 +31,8 @@
 </template>
 
 <script lang="ts">
+import UserService from '../services/UserService';
+
 export default {
   data() {
     return {
@@ -48,17 +50,19 @@ export default {
 
   methods: {
     async login() {
-      const response = await this.$http.post('/auth/login', this.loginData);
+      const response = await UserService.login(this.loginData);
 
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.token);
 
       this.$router.push('/list');
     },
     
     async register() {
-      const response = await this.$http.post('/auth/register', this.registerData);
+      // const response = await this.$http.post('/auth/register', this.registerData);
 
-      localStorage.setItem("token", response.data.token);
+      const response = await UserService.register(this.registerData);
+
+      localStorage.setItem("token", response.token);
 
       this.$router.push('/list');
     },

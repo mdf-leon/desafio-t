@@ -6,7 +6,6 @@
       <div
         v-for="user in users"
         :key="user.username"
-
         class="flex flex-row justify-between items-center border p-3"
       >
         {{ user.username }}
@@ -16,7 +15,9 @@
             <DIcon name="fa-pencil-alt" />
           </DButton>
 
-          <DButton @click.prevent="$router.push(`/edit/${user.username}/permissions`)">
+          <DButton
+            @click.prevent="$router.push(`/edit/${user.username}/permissions`)"
+          >
             <DIcon name="fa-lock-open" />
           </DButton>
 
@@ -30,10 +31,12 @@
 </template>
 
 <script lang="ts">
-import { http } from '../services/HTTP';
+import { http } from "../services/HTTP";
+import UserService from "../services/UserService";
+import { IUser } from "../types/User";
 
 export default {
-  async beforeRouteEnter(to, _, next) {
+  async beforeRouteEnter(_to, _, next) {
     const response = await http.get("/users/");
 
     next((vm: any) => {
@@ -43,8 +46,8 @@ export default {
 
   data() {
     return {
-      users: []
-    }
+      users: [] as IUser[],
+    };
   },
 
   methods: {
@@ -53,11 +56,13 @@ export default {
         return false;
       }
 
-      await this.$http.delete("/users/" + username);
+      await UserService.deleteUser(username);
 
-      const userIndex = this.users.findIndex((user) => user.username === username);
+      const userIndex = this.users.findIndex(
+        (user) => user.username === username
+      );
       this.users.splice(userIndex, 1);
-    }
-  }
-}
+    },
+  },
+};
 </script>

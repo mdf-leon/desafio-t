@@ -8,14 +8,19 @@
       <label
         v-for="permission in permissions"
         :key="permission.name"
-
         class="flex gap-2 items-center"
       >
         <input
           type="checkbox"
-
           :checked="user.permissions.includes(permission.name)"
-          @click="user.permissions.includes(permission.name) ? user.permissions.splice(user.permissions.indexOf(permission.name), 1) : user.permissions.push(permission.name)"
+          @click="
+            user.permissions.includes(permission.name)
+              ? user.permissions.splice(
+                  user.permissions.indexOf(permission.name),
+                  1
+                )
+              : user.permissions.push(permission.name)
+          "
         />
 
         {{ permission.description }}
@@ -28,6 +33,8 @@
 
 <script lang="ts">
 import { http } from "../services/HTTP";
+import UserService from "../services/UserService";
+import { EPermissions } from "../types/User";
 
 export default {
   async beforeRouteEnter(to, _, next) {
@@ -44,45 +51,46 @@ export default {
       saving: false,
 
       user: {
-        username: null,
-        permissions: [] as string[]
+        username: "",
+        permissions: [] as string[],
       },
 
       permissions: [
         {
           name: "changePermissions",
-          description: "Alterar permissões"
+          description: "Alterar permissões",
         },
         {
           name: "createUser",
-          description: "Criar usuários"
+          description: "Criar usuários",
         },
         {
           name: "readUser",
-          description: "Visualizar usuários"
+          description: "Visualizar usuários",
         },
         {
           name: "updateUser",
-          description: "Editar usuários"
+          description: "Editar usuários",
         },
         {
           name: "deleteUser",
-          description: "Apagar usuários"
-        }
-      ]
-    }
+          description: "Apagar usuários",
+        },
+      ],
+    };
   },
 
   methods: {
     async save() {
       this.saving = true;
 
-      await this.$http.patch("/users/" + this.$route.params.username + "/permissions", {
-        permissions: this.user.permissions
-      });
+      await UserService.updateUserPermissions(
+        this.user.username, // || this.$route.params.username,
+        this.user.permissions as EPermissions[]
+      );
 
       this.saving = false;
-    }
+    },
   },
 };
 </script>
