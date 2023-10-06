@@ -5,6 +5,10 @@
       <strong v-if="underEditUser" v-text="underEditUser.username" />
     </h2>
 
+    <h2 v-if="isSuccess" class="text-2xl my-5 text-green-500">
+      Permissions updated successfully!
+    </h2>
+
     <form class="grid grid-cols-1 gap-3" @submit.prevent="save">
       <label
         v-if="underEditUser"
@@ -22,6 +26,7 @@
               : underEditUser.permissions.push(permission.name)
           " -->
         <input
+          :name="'edit-permission-' + permission"
           type="checkbox"
           :checked="
             underEditUser && underEditUser.permissions.includes(permission)
@@ -44,6 +49,7 @@ export default {
   data() {
     return {
       saving: false,
+      isSuccess: false,
       permissionsList: [
         "changePermissions",
         "createUser",
@@ -94,13 +100,19 @@ export default {
 
     async save() {
       this.saving = true;
+      this.isSuccess = false; // Reset the flag every time we save
 
       const payload = {
         username: this.underEditUser.username,
         permissions: this.underEditUser.permissions,
       };
 
-      await this.updateUserPermissions(payload);
+      try {
+        await this.updateUserPermissions(payload);
+        this.isSuccess = true; // Set to true when successfully updated
+      } catch (error) {
+        console.error("Failed to update permissions:", error);
+      }
 
       this.saving = false;
     },

@@ -60,8 +60,7 @@ const UserService = {
   ): Promise<{ success: string; token: string; user: { username: string } }> {
     return http.post("auth/login", userData).then((response) => {
       console.log(response.data);
-      const { password, ...user } = userData;
-      return { ...response.data, user };
+      return response.data;
     });
   },
 };

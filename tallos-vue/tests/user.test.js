@@ -57,59 +57,6 @@ describe('User Flow', () => {
     expect(displayedUsername).toBe(updatedUsername);
 
     expect(page.url()).toBe(`${SERVER_URL}/edit/${updatedUsername}`);
-  });
+  }, 15000);
 
-
-
-  // it('should allow the user to update permissions', async () => {
-  //   await page.goto(`${SERVER_URL}/edit/${timestampedUsername}/permissions`); // Updated route for editing permissions
-
-  //   await page.click('[name="permission-toggle"]');
-  //   await page.click('[name="update-permissions-submit"]');
-
-  //   await page.waitForTimeout(1000);
-  // });
-
-  // it('should allow the user to delete their account', async () => {
-  //   await page.goto(`${SERVER_URL}/edit/${timestampedUsername}`); // Back to the user editing page to delete account
-
-  //   await page.click('[name="delete-account-button"]');
-  //   await page.waitForSelector('[name="confirm-delete"]'); // Assumption: A confirmation dialog appears
-  //   await page.click('[name="confirm-delete"]');
-
-  //   await page.waitForNavigation();
-  //   await page.waitForTimeout(1000);
-  //   expect(page.url()).toBe(`${SERVER_URL}/list`); // After deletion, I assume the user is redirected back to the list
-  // });
 });
-
-
-// it('should allow the user to update their details', async () => {
-//   await page.goto(`${SERVER_URL}/profile`); // Assumption: you have a dedicated profile/edit page
-
-//   await page.type('[name="user-email"]', `${timestampedUsername}@test.com`);
-//   await page.click('[name="update-profile-submit"]');
-
-//   await page.waitForTimeout(1000);
-// });
-
-// it('should allow the user to update permissions', async () => {
-//   await page.goto(`${SERVER_URL}/permissions`); // Assumption: dedicated permissions page
-
-//   await page.click('[name="permission-toggle"]');
-//   await page.click('[name="update-permissions-submit"]');
-
-//   await page.waitForTimeout(1000);
-// });
-
-// it('should allow the user to delete their account', async () => {
-//   await page.goto(`${SERVER_URL}/profile`); // Back to profile to delete account
-
-//   await page.click('[name="delete-account-button"]');
-//   await page.waitForSelector('[name="confirm-delete"]'); // Assumption: A confirmation dialog appears
-//   await page.click('[name="confirm-delete"]');
-
-//   await page.waitForNavigation();
-//   await page.waitForTimeout(1000);
-//   expect(page.url()).toBe(`${SERVER_URL}/goodbye`); // Assumption: Redirected to a goodbye or home page after deletion
-// });

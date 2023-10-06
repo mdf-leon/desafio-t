@@ -33,12 +33,23 @@ import UserService from "../services/UserService";
 
 export default {
   async beforeRouteEnter(to, _, next) {
-    const response = await UserService.getUser(to.params.username as string);
+    if (to.path !== "/create") {
+      const response = await UserService.getUser(to.params.username as string);
 
-    next((vm: any) => {
-      vm.oldUsername = response.user.username;
-      vm.user = response.user;
-    });
+      // Ensure that the response contains the user property.
+      if (!response || !response.user) {
+        console.error("Failed to fetch user:", response);
+        next();
+        return;
+      }
+
+      next((vm: any) => {
+        vm.oldUsername = response.user.username;
+        vm.user = response.user;
+      });
+    } else {
+      next();
+    }
   },
 
   data() {
