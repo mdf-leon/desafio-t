@@ -21,7 +21,10 @@
             <DIcon name="fa-lock-open" />
           </DButton>
 
-          <DButton color="red" @click.prevent="deleteUser(user.username)">
+          <DButton
+            color="red"
+            @click.prevent="confirmAndDeleteUser(user.username)"
+          >
             <DIcon name="fa-trash" />
           </DButton>
         </div>
@@ -30,38 +33,29 @@
   </div>
 </template>
 
-<script lang="ts">
-import { http } from "../services/HTTP";
-import UserService from "../services/UserService";
-import { IUser } from "../types/User";
+<script lang="ts"> 
+import { mapActions, mapState } from "vuex";
 
 export default {
   async beforeRouteEnter(_to, _, next) {
-    const response = await http.get("/users/");
-
     next((vm: any) => {
-      vm.users.push(...response.data.users);
+      vm.fetchUsers();
     });
   },
+ 
 
-  data() {
-    return {
-      users: [] as IUser[],
-    };
+  computed: {
+    ...mapState(["users"]),
   },
 
   methods: {
-    async deleteUser(username: string) {
+    ...mapActions(["fetchUsers", "deleteUser"]),
+
+    async confirmAndDeleteUser(username: string) {
       if (!confirm("Deseja mesmo apagar " + username + "?")) {
-        return false;
+        return;
       }
-
-      await UserService.deleteUser(username);
-
-      const userIndex = this.users.findIndex(
-        (user) => user.username === username
-      );
-      this.users.splice(userIndex, 1);
+      this.deleteUser(username) 
     },
   },
 };

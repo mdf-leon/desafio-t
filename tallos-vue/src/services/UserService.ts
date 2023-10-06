@@ -55,10 +55,13 @@ const UserService = {
     });
   },
 
-  login(userData: IAuthUser): Promise<{ success: string; token: string }> {
+  login(
+    userData: IAuthUser
+  ): Promise<{ success: string; token: string; user: { username: string } }> {
     return http.post("auth/login", userData).then((response) => {
       console.log(response.data);
-      return response.data;
+      const { password, ...user } = userData;
+      return { ...response.data, user };
     });
   },
 };

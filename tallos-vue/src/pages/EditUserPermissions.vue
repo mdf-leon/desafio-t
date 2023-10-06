@@ -1,29 +1,35 @@
 <template>
   <div class="container my-5 w-3/4 mx-auto">
     <h2 class="text-xl mb-5">
-      Editando permissões de <strong v-text="user.username" />
+      Editando permissões de
+      <strong v-if="underEditUser" v-text="underEditUser.username" />
     </h2>
 
     <form class="grid grid-cols-1 gap-3" @submit.prevent="save">
       <label
-        v-for="permission in permissions"
-        :key="permission.name"
+        v-if="underEditUser"
+        v-for="permission in permissionsList"
+        :key="permission"
         class="flex gap-2 items-center"
       >
-        <input
-          type="checkbox"
-          :checked="user.permissions.includes(permission.name)"
-          @click="
-            user.permissions.includes(permission.name)
-              ? user.permissions.splice(
-                  user.permissions.indexOf(permission.name),
+        <!-- :checked="underEditUser.permissions.includes(permission.name)" -->
+        <!-- @click="
+            underEditUser.permissions.includes(permission.name)
+              ? underEditUser.permissions.splice(
+                  underEditUser.permissions.indexOf(permission.name),
                   1
                 )
-              : user.permissions.push(permission.name)
+              : underEditUser.permissions.push(permission.name)
+          " -->
+        <input
+          type="checkbox"
+          :checked="
+            underEditUser && underEditUser.permissions.includes(permission)
           "
+          @click="togglePermission(permission)"
         />
 
-        {{ permission.description }}
+        {{ permission }}
       </label>
 
       <DButton type="submit" class="mt-5" :disabled="saving">Salvar</DButton>
@@ -32,62 +38,69 @@
 </template>
 
 <script lang="ts">
-import { http } from "../services/HTTP";
-import UserService from "../services/UserService";
-import { EPermissions } from "../types/User";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
-  async beforeRouteEnter(to, _, next) {
-    const response = await http.get("/users/" + to.params.username);
-
-    next((vm: any) => {
-      vm.user.username = response.data.user.username;
-      vm.user.permissions.push(...response.data.user.permissions);
-    });
-  },
-
   data() {
     return {
       saving: false,
-
-      user: {
-        username: "",
-        permissions: [] as string[],
-      },
-
-      permissions: [
-        {
-          name: "changePermissions",
-          description: "Alterar permissões",
-        },
-        {
-          name: "createUser",
-          description: "Criar usuários",
-        },
-        {
-          name: "readUser",
-          description: "Visualizar usuários",
-        },
-        {
-          name: "updateUser",
-          description: "Editar usuários",
-        },
-        {
-          name: "deleteUser",
-          description: "Apagar usuários",
-        },
+      permissionsList: [
+        "changePermissions",
+        "createUser",
+        "readUser",
+        "updateUser",
+        "deleteUser",
       ],
     };
   },
 
+  async beforeRouteEnter(to, _, next) {
+    next((vm: any) => {
+      vm.fetchUserUnderEdit(to.params.username);
+    });
+  },
+
+  computed: {
+    ...mapGetters(["underEditUser", "permissions"]),
+  },
+
+  watch: {
+    underEditUser: {
+      handler(newValue) {
+        if (newValue) {
+          // Handle changes to underEditUser if necessary
+          // For now, this is just a placeholder. You can fetch or handle other necessary logic here.
+        }
+      },
+      deep: true,
+    },
+  },
+
   methods: {
+    ...mapActions(["fetchUserUnderEdit", "updateUserPermissions"]),
+
+    togglePermission(permissionName) {
+      if (this.underEditUser) {
+        if (this.underEditUser.permissions.includes(permissionName)) {
+          this.underEditUser.permissions.splice(
+            this.underEditUser.permissions.indexOf(permissionName),
+            1
+          );
+        } else {
+          this.underEditUser.permissions.push(permissionName);
+        }
+      }
+    },
+
     async save() {
       this.saving = true;
 
-      await UserService.updateUserPermissions(
-        this.user.username, // || this.$route.params.username,
-        this.user.permissions as EPermissions[]
-      );
+      const payload = {
+        username: this.underEditUser.username,
+        permissions: this.underEditUser.permissions,
+      };
+
+      await this.updateUserPermissions(payload);
 
       this.saving = false;
     },
