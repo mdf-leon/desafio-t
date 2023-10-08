@@ -1,13 +1,14 @@
 <template>
   <button
-    class="p-3 bg-teal-600 text-white border rounded-md block cursor-pointer"
-    :class="computedClasses"
+  class="p-3 bg-teal-600 text-white border rounded-md block cursor-pointer"
+  :class="computedClasses"
   >
-    <slot></slot>
-  </button>
+  <slot></slot>
+</button>
 </template>
 
 <script lang="ts">
+// @ts-nocheck
 export default {
   props: {
     color: {

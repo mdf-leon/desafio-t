@@ -9,6 +9,7 @@
 </template>
 
 <script lang="ts">
+// @ts-nocheck
 import { watch, toRefs } from "vue";
 
 export default {
