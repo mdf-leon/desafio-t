@@ -56,7 +56,8 @@ export class AuthController {
   async login(@Body() { username, password }: LoginUserDto) {
     try {
       const token = await this.authService.login(username, password);
-      return { success: 'Login successful', token };
+      const user = await this.usersService.getUser(username);
+      return { success: 'Login successful', token, user };
     } catch (error) {
       throw new UnauthorizedException(
         formatError(this.configService, 'Login failed', error),
