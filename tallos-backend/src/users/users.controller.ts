@@ -19,8 +19,8 @@ import { User } from './user.model';
 import {
   UserUsernameDto,
   UpdateUserReqDto,
-  UserDto,
   UserPermissionReqDto,
+  CreateUserReqDto,
 } from './dto/user.dto';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -43,7 +43,10 @@ export class UsersController {
     status: 201,
     description: 'The user has been successfully created.',
   })
-  async addUser(@Body() { username, password }: UserDto, @Req() req: Request) {
+  async addUser(
+    @Body() { username, password }: CreateUserReqDto,
+    @Req() req: Request,
+  ) {
     if (!this.hasPermission(req.user, 'createUser')) {
       throw new ForbiddenException('Permission denied');
     }
