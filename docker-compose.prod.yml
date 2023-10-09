@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  backend:
+    image: node:alpine
+    container_name: nest-backend
+    build:
+      context: ./tallos-backend
+      dockerfile: Dockerfile
+    environment:
+      - PORT=3000
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./tallos-backend/src:/app/src
+
+  frontend:
+    container_name: vite-frontend
+    ports:
+      - '3333:80'
+    build: 
+      context: ./tallos-vue
+      dockerfile: Dockerfile
